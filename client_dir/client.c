@@ -9,64 +9,53 @@
 #include <netdb.h>
 #include <string.h>
 
-/* codul de eroare returnat de anumite apeluri */
-extern int errno;
 
-/* portul de conectare la server*/
+// the port and the address
 #define PORT 2024
 #define ADDR "127.0.0.1"
 
+extern int errno;
+
 int main (int argc, char *argv[])
 {
-  int sd;			// descriptorul de socket
-  struct sockaddr_in server;	// structura folosita pentru conectare 
-  char msg[100];		// mesajul trimis
+  int sd;			// socket descriptor
+  struct sockaddr_in server;	// the structure for the server where we will connect
 
-  /* cream socketul */
+  // creating the socket
   if ((sd = socket (AF_INET, SOCK_STREAM, 0)) == -1)
-    {
-      perror ("Eroare la socket().\n");
-      return errno;
-    }
+  {
+    perror ("[-]Error at socket().\n");
+    return errno;
+  }
 
-  /* umplem structura folosita pentru realizarea conexiunii cu serverul */
-  /* familia socket-ului */
+  // socket family
   server.sin_family = AF_INET;
-  /* adresa IP a serverului */
+  // server i address
   server.sin_addr.s_addr = inet_addr(ADDR);
-  /* portul de conectare */
+  // the port
   server.sin_port = htons (PORT);
-  
-  /* ne conectam la server */
+
+  // connecting to the server
   if (connect (sd, (struct sockaddr *) &server,sizeof (struct sockaddr)) == -1)
-    {
-      perror ("[client]Eroare la connect().\n");
-      return errno;
-    }
+  {
+    perror ("[-]Eroare la connect().\n");
+    return errno;
+  }
 
-  /* citirea mesajului */
-  bzero (msg, 100);
-  printf ("[client]Introduceti un nume: ");
-  fflush (stdout);
-  read (0, msg, 100);
-  
-  /* trimiterea mesajului la server */
-  if (write (sd, msg, 100) <= 0)
-    {
-      perror ("[client]Eroare la write() spre server.\n");
-      return errno;
-    }
+  printf("Connected to the server succesfully!");
 
-  /* citirea raspunsului dat de server 
-     (apel blocant pina cind serverul raspunde) */
+  char msg[255];
   if (read (sd, msg, 100) < 0)
-    {
-      perror ("[client]Eroare la read() de la server.\n");
-      return errno;
-    }
-  /* afisam mesajul primit */
-  printf ("[client]Mesajul primit este: %s\n", msg);
+  {
+    perror ("[-]Eroare la read() de la server.\n");
+    return errno;
+  }
 
-  /* inchidem conexiunea, am terminat */
+
+
+
+  printf("[-]Game done!\n");
+
+  // closing the socket descriptor
   close (sd);
 }

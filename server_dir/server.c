@@ -64,7 +64,7 @@ int main()
     // getting ready the client structure
     bzero(&from, sizeof(from));
 
-    // reading the config file
+    // reading the config file for the max number of players in one game
     FILE *fp;
     fp = fopen("config_file.txt", "r");
     char file_content[255];
@@ -89,14 +89,13 @@ int main()
 
         if(ok == 1)
         {
-            printf("[+]Waiting for players to start new game...\n");
-            clients[1] = accept(sd, (struct sockaddr *)&from, &length);
+            printf("[+]1.Waiting for players to start new game...\n");
+            clients[max] = accept(sd, (struct sockaddr *)&from, &length);
             ok = 0;
         }
         else
         {
-            // wait for game to get all the players and then accept more players for new game, with a FIFO
-            printf("[+]Waiting for players to start new game...\n");
+            // wait for the game to get all the players and then accept more players for new game, with a FIFO
 
             mknod(FIFO_NAME, S_IFIFO | 0666, 0);
             fd = open(FIFO_NAME, O_RDONLY);
@@ -104,11 +103,14 @@ int main()
             if ((num = read(fd, s, 300)) == -1)
                 perror("[-]Error at reading the FIFO!\n");
             else
-                clients[1] = accept(sd, (struct sockaddr *)&from, &length);
+            {
+                printf("[+]o.Waiting for players to start new game...\n");
+                clients[max] = accept(sd, (struct sockaddr *)&from, &length);
+            }
         }
 
         // accepting the client
-        if (clients[1] < 0)
+        if (clients[max] < 0)
         {
             perror("[-]Error at accepting the client.\n");
             continue;
@@ -154,6 +156,8 @@ int main()
                     perror("[-]Error at the writing the FIFO!\n");
 
                 // TODO: start game with clients[]
+
+                
 
                 printf("[+]Game done.\n");
 
