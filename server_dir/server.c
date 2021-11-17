@@ -7,9 +7,13 @@
 #include <stdlib.h>
 #include <netdb.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 // the port
 #define PORT 2024
+#define FIFO_NAME "MyTest_FIFO"
 
 extern int errno;
 
@@ -27,7 +31,7 @@ int main()
     // for bind problems on forcing close server
     int enable = 1;
     if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
-        perror("setsockopt(SO_REUSEADDR) failed");
+        perror("setsockopt(SO_REUSEADDR) failed\n");
     
     struct sockaddr_in server; // server structure
 
@@ -72,30 +76,33 @@ int main()
 
     int max;
     int ok = 1;
+
     while (1)
     {
         int clients[255]; // client socket descriptor
         int length = sizeof(from);
+        char s[300];
+        int num, fd;
 
         printf("[+]Waiting on the port %d...\n", PORT);
         fflush(stdout);
 
         if(ok == 1)
         {
+            printf("[+]Waiting for players to start new game...\n");
             clients[1] = accept(sd, (struct sockaddr *)&from, &length);
             ok = 0;
         }
         else
         {
-            // wait for game to get all the players and then accept, with a FIFO
-            char s[300];
-            int num, fd;
+            // wait for game to get all the players and then accept more players for new game, with a FIFO
+            printf("[+]Waiting for players to start new game...\n");
 
             mknod(FIFO_NAME, S_IFIFO | 0666, 0);
             fd = open(FIFO_NAME, O_RDONLY);
 
             if ((num = read(fd, s, 300)) == -1)
-                perror("[-]Error at reading the FIFO!");
+                perror("[-]Error at reading the FIFO!\n");
             else
                 clients[1] = accept(sd, (struct sockaddr *)&from, &length);
         }
@@ -112,7 +119,7 @@ int main()
 
             int pid;
         
-            // making a process for the client
+            // making a process for the game
             if ((pid = fork()) == -1) // error at fork
             {
                 close(clients[max]);
@@ -132,17 +139,19 @@ int main()
 
                 while(max < max_number_of_players)
                 {
+                    printf("[+]Game in waiting for other players...\n");
                     clients[max] = accept(sd, (struct sockaddr *)&from, &length);
                     max++;
                 }
 
-                close(sd); // no more players in the game
+                printf("[+]Game has started!\n");
+                close(sd); // no more players for the game
 
                 // let main process accept more games, with a FIFO
                 fd = open(FIFO_NAME, O_WRONLY);
 
                 if ((num = write(fd, s, strlen(s))) == -1)
-                    perror("[-]Error at the writing the FIFO!");
+                    perror("[-]Error at the writing the FIFO!\n");
 
                 // TODO: start game with clients[]
 
