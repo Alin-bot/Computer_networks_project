@@ -9,12 +9,99 @@
 #include <netdb.h>
 #include <string.h>
 
-
 // the port and the address
 #define PORT 2024
 #define ADDR "127.0.0.1"
 
 extern int errno;
+
+int readOrder(int sd)
+{
+  int order;
+  fflush(stdout);
+
+  if (read (sd, &order, sizeof(int)) < 0)
+  {
+    perror ("[-]Error at read().\n");
+    return errno;
+  }
+
+  return order;
+}
+
+void chooseLetter(char* letter)
+{
+  // input a letter
+  printf("You are the first player! Choose a letter: ");
+  bzero(letter, 2);
+  fflush(stdout);
+
+  read(0, letter, 2);
+}
+
+void chooseWord(char* word)
+{
+  // input a word
+  printf("Choose a word with your letter: ");
+  bzero(word, 100);
+  fflush(stdout);
+
+  read(0, word, 100);
+}
+
+void chooseWordBasedOnLetters(char* letters, char* word)
+{
+  // input a word
+  printf("Choose a word with the letters (%s): ", letters);
+  bzero(word, 100);
+  fflush(stdout);
+
+  read(0, word, 100);
+}
+
+void sendLetter(int sd, char* letter)
+{
+  // send the letter to the server
+  if (write(sd, letter, 2) <= 0)
+  {
+    perror("[-]Error at write().\n");
+  }
+}
+
+void sendWord(int sd, char* word)
+{
+  // send the word to the server
+  if (write(sd, word, 100) <= 0)
+  {
+    perror("[-]Error at write().\n");
+  }
+}
+
+void readLetter(int sd, char* letter)
+{
+  bzero(letter, 2);
+  fflush(stdout);
+
+  // read the letter
+  if (read (sd, letter, 2) < 0)
+  {
+    perror ("[-]Error at read().\n");
+    return errno;
+  }
+}
+
+void readWord(int sd, char* word)
+{
+  bzero(word, 100);
+  fflush(stdout);
+
+  // read the word
+  if (read (sd, word, 100) < 0)
+  {
+    perror ("[-]Error at read().\n");
+    return errno;
+  }
+}
 
 int main (int argc, char *argv[])
 {
@@ -42,19 +129,62 @@ int main (int argc, char *argv[])
     return errno;
   }
 
-  printf("Connected to the server succesfully!");
+  printf("[+]Connected to the server succesfully!\n");
 
-  char msg[255];
-  if (read (sd, msg, 100) < 0)
+  char letter[2];
+  char word[100];
+
+  while(1)
   {
-    perror ("[-]Eroare la read() de la server.\n");
-    return errno;
+    int order = readOrder(sd);
+    printf("Your order number is: %d\n", order);
+
+    // if first player of first round - else other players
+    if(order == 0)
+    {
+      // chose letter and send to server
+      chooseLetter(letter);
+      printf("The letter you chose is: %s", letter);
+      sendLetter(sd, letter);
+      printf("[+]The letter was send!\n");
+
+      // chose word and send to server
+
+      chooseWord(word);
+      sendWord(sd, word);
+    }
+    else 
+    {
+      printf("A player is choosing a word, please wait %d more rounds..\n", order);
+
+      // read letter
+      readLetter(sd, letter);
+      printf("The player chose the letter: %s", letter);
+
+      // read word
+      readWord(sd, word);
+      printf("The player chose the word: %s", word);
+    }
+/*
+    int response;
+
+    // read the response (if all is good)
+    if (read(sd, response, sizeof(int)) < 0)
+    {
+      perror ("[-]Error at read().\n");
+      return errno;
+    }
+
+    if(response == 0)
+    {
+      printf("You'll be kicked out!");
+      break;
+    }*/
   }
 
 
 
-
-  printf("[-]Game done!\n");
+  printf("[+]Game done!\n");
 
   // closing the socket descriptor
   close (sd);

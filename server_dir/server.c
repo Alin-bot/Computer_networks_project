@@ -17,6 +17,64 @@
 
 extern int errno;
 
+void sendOrder(int sd, int order)
+{
+    if (write(sd, &order, sizeof(int)) <= 0)
+    {
+      perror("[-]Error at write().\n");
+    }
+    else
+      printf("[+]Wrote the order to the client %d.\n", order);
+}
+
+void sendLetter(int sd, char* letter)
+{
+  // send the letter to the server
+  if (write(sd, letter, 2) <= 0)
+  {
+    perror("[-]Error at write().\n");
+  }
+}
+
+void sendWord(int sd, char* word)
+{
+  // send the word to the server
+  if (write(sd, word, 100) <= 0)
+  {
+    perror("[-]Error at write().\n");
+  }
+}
+
+void readLetter(int sd, char* letter)
+{
+  bzero(letter, 2);
+  fflush(stdout);
+
+  // read the letter
+  if (read (sd, letter, 2) < 0)
+  {
+    perror ("[-]Error at read().\n");
+    return errno;
+  }
+}
+
+void readWord(int sd, char* word)
+{
+  bzero(word, 100);
+  fflush(stdout);
+
+  // read the word
+  if (read (sd, word, 100) < 0)
+  {
+    perror ("[-]Error at read().\n");
+    return errno;
+  }
+}
+
+int wordIsGood(char* word)
+{
+    return 1;
+}
 int main()
 {
     int sd; // socket descriptor
@@ -155,9 +213,89 @@ int main()
                 if ((num = write(fd, s, strlen(s))) == -1)
                     perror("[-]Error at the writing the FIFO!\n");
 
-                // TODO: start game with clients[]
+                // start game with clients[]
 
-                
+                while(max_number_of_players != 0)
+                {
+                    // send the orders of the players
+                    for (int i = 0; i < max_number_of_players; ++i)
+                    {
+                        sendOrder(clients[i], i);
+                    }
+
+                    char letter[2];
+
+                    // read the letter of the first player
+                    readLetter(clients[0], letter);
+
+                    for (int i = 1; i < max_number_of_players; ++i)
+                    {
+                        sendLetter(clients[i], letter);
+                    }
+
+                    char word[100];
+
+                    // read the word of the first player
+                    readWord(clients[0], word);
+
+                    for (int i = 1; i < max_number_of_players; ++i)
+                    {
+                        sendWord(clients[i], word);
+                    }
+
+                    // if word is in dictionary
+                    /*if(wordIsGood(word))
+                    {
+                        // let the players know the game will continue
+                        for (int i = 0; i < max_number_of_players; ++i)
+                        {
+                            if (write(clients[i], 1, sizeof(int)) <= 0)
+                            {
+                              perror("[-]Error at write().\n");
+                            }
+                        close(clients[0]);
+                        }
+
+                        int copy = clients[0];
+
+                        for (int i = 1; i < max_number_of_players; ++i)
+                        {
+                            clients[i-1] = clients[i];
+                        }
+
+                        clients[max_number_of_players-1] = copy;
+                    }
+                    else
+                    {   // the first player will be kicked out
+                        if (write(clients[0], 0, sizeof(int)) <= 0)
+                        {
+                          perror("[-]Error at write().\n");
+                        }
+                        close(clients[0]);
+
+                        // edit the list of socket descriptors of clients
+                        for (int i = 1; i < max_number_of_players; ++i)
+                        {
+                            clients[i-1] = clients[i];
+                        }
+                        max_number_of_players--;
+
+                        // let the other players know the game will continue
+                        for (int i = 0; i < max_number_of_players; ++i)
+                        {
+                            if (write(clients[i], 1, sizeof(int)) <= 0)
+                            {
+                              perror("[-]Error at write().\n");
+                            }
+                        }
+                    }*/
+                }
+             
+
+
+
+
+
 
                 printf("[+]Game done.\n");
 
