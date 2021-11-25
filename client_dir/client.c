@@ -15,6 +15,7 @@
 
 extern int errno;
 
+// read a number from socket descriptor and return it
 int readOrder(int sd)
 {
   int order;
@@ -29,6 +30,7 @@ int readOrder(int sd)
   return order;
 }
 
+// read from player input a letter
 void chooseLetter(char* letter)
 {
   // input a letter
@@ -39,6 +41,7 @@ void chooseLetter(char* letter)
   read(0, letter, 2);
 }
 
+// read from player input a word
 void chooseWord(char* word)
 {
   // input a word
@@ -49,6 +52,7 @@ void chooseWord(char* word)
   read(0, word, 100);
 }
 
+// read from player input a word with 
 void chooseWordBasedOnLetters(char* letters, char* word)
 {
   // input a word
@@ -59,6 +63,7 @@ void chooseWordBasedOnLetters(char* letters, char* word)
   read(0, word, 100);
 }
 
+// send a letter to socket descriptor 
 void sendLetter(int sd, char* letter)
 {
   // send the letter to the server
@@ -68,6 +73,7 @@ void sendLetter(int sd, char* letter)
   }
 }
 
+// send a word to socket descriptor
 void sendWord(int sd, char* word)
 {
   // send the word to the server
@@ -77,6 +83,7 @@ void sendWord(int sd, char* word)
   }
 }
 
+// read a letter from socket descriptor
 void readLetter(int sd, char* letter)
 {
   bzero(letter, 2);
@@ -90,6 +97,7 @@ void readLetter(int sd, char* letter)
   }
 }
 
+// read word from socket descriptor
 void readWord(int sd, char* word)
 {
   bzero(word, 100);
@@ -131,11 +139,13 @@ int main (int argc, char *argv[])
 
   printf("[+]Connected to the server succesfully!\n");
 
-  char letter[2];
-  char word[100];
+
 
   while(1)
   {
+    char letter[2];
+    char word[100];
+
     int order = readOrder(sd);
     printf("Your order number is: %d\n", order);
 

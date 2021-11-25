@@ -17,6 +17,7 @@
 
 extern int errno;
 
+// send number to socket descriptor
 void sendOrder(int sd, int order)
 {
     if (write(sd, &order, sizeof(int)) <= 0)
@@ -27,6 +28,7 @@ void sendOrder(int sd, int order)
       printf("[+]Wrote the order to the client %d.\n", order);
 }
 
+// send a letter to socket descriptor 
 void sendLetter(int sd, char* letter)
 {
   // send the letter to the server
@@ -36,6 +38,7 @@ void sendLetter(int sd, char* letter)
   }
 }
 
+// send a word to socket descriptor
 void sendWord(int sd, char* word)
 {
   // send the word to the server
@@ -45,6 +48,7 @@ void sendWord(int sd, char* word)
   }
 }
 
+// read a letter from socket descriptor
 void readLetter(int sd, char* letter)
 {
   bzero(letter, 2);
@@ -58,6 +62,7 @@ void readLetter(int sd, char* letter)
   }
 }
 
+// read word from socket descriptor
 void readWord(int sd, char* word)
 {
   bzero(word, 100);
@@ -71,10 +76,12 @@ void readWord(int sd, char* word)
   }
 }
 
+// function that see if word is in dictionary
 int wordIsGood(char* word)
 {
     return 1;
 }
+
 int main()
 {
     int sd; // socket descriptor
@@ -132,7 +139,7 @@ int main()
     printf("%d\n", max_number_of_players);
     
 
-    int max;
+    int max = 0;
     int ok = 1;
 
     while (1)
@@ -146,7 +153,8 @@ int main()
         fflush(stdout);
 
         if(ok == 1)
-        {
+        { 
+            // first game from the main process
             printf("[+]1.Waiting for players to start new game...\n");
             clients[max] = accept(sd, (struct sockaddr *)&from, &length);
             ok = 0;
@@ -158,6 +166,7 @@ int main()
             mknod(FIFO_NAME, S_IFIFO | 0666, 0);
             fd = open(FIFO_NAME, O_RDONLY);
 
+            printf("[main] Waiting...\n");
             if ((num = read(fd, s, 300)) == -1)
                 perror("[-]Error at reading the FIFO!\n");
             else
@@ -175,8 +184,6 @@ int main()
         }
         else
         {
-            max = 0;
-
             int pid;
         
             // making a process for the game
@@ -242,9 +249,9 @@ int main()
                     {
                         sendWord(clients[i], word);
                     }
-
-                    // if word is in dictionary
-                    /*if(wordIsGood(word))
+/*
+                    // verify word
+                    if(wordIsGood(word))
                     {
                         // let the players know the game will continue
                         for (int i = 0; i < max_number_of_players; ++i)
