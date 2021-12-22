@@ -7,7 +7,7 @@ void sendNumber(int number, int sd)
         perror("[-] Error at write().\n");
     }
     else
-        printf("[+] Wrote the number to the socket %d.\n", number);
+        printf("[+] Wrote the number %d to the socket %d.\n", number, sd);
 }
 
 // read a number from a socket descriptor and return it
@@ -16,13 +16,11 @@ int readNumber(int sd)
     int number;
     fflush(stdout);
     
-    printf("we ll read number from %d\n", sd);
     if (read(sd, &number, sizeof(int)) < 0)
     {
         perror("[-] Error at read().\n");
         return errno;
     }
-    printf("we read\n");
 
     return number;
 }
@@ -37,7 +35,7 @@ void sendLetter(char *letter, int sd)
 }
 
 // read a letter from a socket descriptor and return it
-void readLetter(int sd, char* letter)
+void readLetter(char* letter, int sd)
 {
     bzero(letter, 2);
     fflush(stdout);
@@ -53,14 +51,16 @@ void readLetter(int sd, char* letter)
 // send a word to a socket descriptor
 void sendWord(char *word, int sd)
 {
+    printf("We will send the word to the socket\n");
     if (write(sd, word, 100) <= 0)
     {
         perror("[-] Error at write().\n");
     }
+    printf("Word sent\n");
 }
 
 // read a word from a socket descriptor and return it
-void readWord(int sd, char* word)
+void readWord(char* word, int sd)
 {
     bzero(word, 100);
     fflush(stdout);
