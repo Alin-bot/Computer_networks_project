@@ -63,7 +63,6 @@ void playFirstRound(int sd, char* word, int order_number)
         printf("The word you chose is: %s\n", word);
 
 		sendWord(word, sd);
-        printf("Hello");
 	}
 	else // other players will wait
 	{
@@ -141,21 +140,21 @@ int main ()
 			playFirstRound(sd, word, order_number);
 
 			// if word was good
-            printf("We need to read the OK");
+            printf("We need to read the OK\n");
 			int OK = readNumber(sd);
-            printf("We read the OK");
+            printf("We read the OK\n");
 			if(OK == 1)
 			{
-				printf("[+] The word was correct! The next player will continue.\n");
+				printf("[+] The word was correct! The next player will continue..\n");
 			}
 			else if(OK == 0 && order_number == 0)
 			{
 				printf("[-] You chose a wrong word, you will be disconnected!\n");
 				close(sd);
 			}
-			else if(OK == 0 && order_number != 0)
+			else if(OK == 0)
 			{
-				printf("[+] The word was wrong. The other player will continue.\n");
+				printf("[+] The word was wrong. The other player will continue..\n");
 			}
 			else if(OK == 2)
 			{
@@ -176,7 +175,7 @@ int main ()
 			int OK = readNumber(sd);
 			if(OK == 1)
 			{
-				printf("[+] The word was correct! The next player will continue.\n");
+				printf("[+] The word was correct! The next player will continue..\n");
 			}
 			else if(OK == 0 && order_number == 0)
 			{
@@ -185,7 +184,7 @@ int main ()
 			}
 			else if(OK == 0 && order_number != 0)
 			{
-				printf("[+] The word was wrong. The other player will continue.\n");
+				printf("[+] The word was wrong. The other player will continue..\n");
 			}
 			else if(OK == 2)
 			{

@@ -55,15 +55,22 @@ void closePlayersList(int max_number_of_players, int list[max_number_of_players]
 // function that see if word is in dictionary
 int wordIsGood(char* word, char* letter)
 {
-    printf("word: %s, letter %s\n", word, letter);
     if(word == letter)
+    {
+        printf("[-] Word is wrong!\n");
         return 0;
+    }
     else
+    {
+        printf("[+] Word is good!\n");
         return 1;
+    }
 }
 
 void playFirstRound(int max_number_of_players, int players_list[max_number_of_players], char* word, char* letter)
 {
+    printf("[+] Playing first round..\n");
+
     // give players the order number to know when is their turn
     for (int i = 0; i < max_number_of_players; ++i)
     {
@@ -80,6 +87,7 @@ void playFirstRound(int max_number_of_players, int players_list[max_number_of_pl
         sendLetter(letter, players_list[i]);
     }
 
+    printf("stopped to read word\n");
     // read the word of the first player
     readWord(word, players_list[0]);
 
@@ -92,6 +100,8 @@ void playFirstRound(int max_number_of_players, int players_list[max_number_of_pl
 
 void playNormalRounds(int max_number_of_players, int players_list[max_number_of_players], char* word)
 {
+    printf("[+] Playing/Continue game after first round.\n");
+
     // give players the order number to know when is their turn
     for (int i = 0; i < max_number_of_players; ++i)
     {
@@ -109,6 +119,8 @@ void playNormalRounds(int max_number_of_players, int players_list[max_number_of_
 }
 void sendNumberToAllPlayers(int max_number_of_players, int players_list[max_number_of_players], int number)
 {
+    printf("[+] Send OK = %d to clients..\n", number);
+
     for (int i = 0; i < max_number_of_players; ++i)
     {
         sendNumber(number, players_list[i]);
@@ -118,6 +130,8 @@ void sendNumberToAllPlayers(int max_number_of_players, int players_list[max_numb
 // function that shifts to the left all the sds and puts the first old sd from list at the end of the list
 void changePlayersOrderInList(int max_number_of_players, int players_list[max_number_of_players])
 {
+    printf("[+] Change players list..\n");
+
     int first_sd = players_list[0];
 
     // edit the list of socket descriptors of clients
@@ -233,7 +247,6 @@ int main()
                     printf("[?] Checking if word is good..\n");
                     if(wordIsGood(word, letter))
                     {
-                        printf("[+] Word is good!\n");
                         sendNumberToAllPlayers(max_number_of_players, players_list, 1);
 
                         changePlayersOrderInList(max_number_of_players, players_list);
@@ -241,7 +254,6 @@ int main()
                     }
                     else // if the player chose a wrong word
                     {
-                        printf("[-] Word is wrong!\n");
                         sendNumberToAllPlayers(max_number_of_players, players_list, 0);
 
                         close(players_list[0]);
@@ -263,7 +275,7 @@ int main()
                     strcat(letters, &word[strlen(word) - 3]);
                     strcat(letters, &word[strlen(word) - 2]); // get the last 2 letters of the last word
 
-                    printf("the last letters are: %s haha\n", letters);
+                    printf("the last letters are: %c%c\n", letters[0], letters[1]);
 
                     playNormalRounds(max_number_of_players, players_list, word);
 
