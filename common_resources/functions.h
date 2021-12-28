@@ -28,9 +28,9 @@ int readNumber(int sd)
 }
 
 // send a letter to a socket descriptor
-void sendLetter(char *letter, int sd)
+void sendLetter(char* letter, int sd)
 {
-    printf("[f] Sending the letter '%s' to the socket %d\n", letter, sd);
+    printf("[f] Sending the letter %s to the socket %d\n", letter, sd);
 
     if (write(sd, letter, 2) <= 0)
     {
@@ -58,9 +58,9 @@ void readLetter(char* letter, int sd)
 }
 
 // send a word to a socket descriptor
-void sendWord(char *word, int sd)
+void sendWord(char* word, int sd)
 {
-    printf("[f] Sending the word '%s' to the socket %d\n", word, sd);
+    printf("[f] Sending the word %s to the socket %d\n", word, sd);
 
     if (write(sd, word, 100) <= 0)
     {
@@ -85,4 +85,14 @@ void readWord(char* word, int sd)
     }
 
     printf("[f] Read the word %s\n", word);
+}
+
+void getLastTwoLetters(char* word, char* letters)
+{
+    printf("[f] Getting the last two letters..");
+
+    strcat(letters, &word[strlen(word) - 2]);
+    strcat(letters, &word[strlen(word) - 1]); // get the last 2 letters of the last word
+
+    printf("the last letters are: %c%c\n", letters[0], letters[1]);
 }

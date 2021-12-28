@@ -77,7 +77,6 @@ void playFirstRound(int max_number_of_players, int players_list[max_number_of_pl
         sendNumber(i, players_list[i]);
     }
 
-    printf("stopped to read letter\n");
     // read the letter of the first player
     readLetter(letter, players_list[0]);
 
@@ -87,7 +86,6 @@ void playFirstRound(int max_number_of_players, int players_list[max_number_of_pl
         sendLetter(letter, players_list[i]);
     }
 
-    printf("stopped to read word\n");
     // read the word of the first player
     readWord(word, players_list[0]);
 
@@ -237,8 +235,9 @@ int main()
                 {
                     if(max_number_of_players == 1)
                     {
-                        sendNumber(2, players_list[0]); // won because last player
-                        exit(0);
+                        sendNumber(999, players_list[0]); // won because last player
+                        OK = 2;
+                        break;
                     }
 
                     playFirstRound(max_number_of_players, players_list, word, letter);
@@ -267,15 +266,17 @@ int main()
                     }
                 }
 
+                if(OK == 2)
+                {
+                    break;
+                }
+
                 while(OK == 1)
                 {
                     char letters[3];
                     bzero(letters, 3);
 
-                    strcat(letters, &word[strlen(word) - 3]);
-                    strcat(letters, &word[strlen(word) - 2]); // get the last 2 letters of the last word
-
-                    printf("the last letters are: %c%c\n", letters[0], letters[1]);
+                    getLastTwoLetters(word, letters);
 
                     playNormalRounds(max_number_of_players, players_list, word);
 
@@ -301,10 +302,6 @@ int main()
                         OK = 0;
                     }
                 }
-
-                
-
-
             }
 
             printf("[+]Game done.\n");
@@ -312,7 +309,6 @@ int main()
             closePlayersList(max_number_of_players, players_list);
 
             exit(0);
-
         }
 
         bzero(players_list, max_number_of_players);
