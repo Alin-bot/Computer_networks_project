@@ -31,10 +31,10 @@ void chooseWord(char* word)
 {
     // input a word
     printf("Choose a word with your letter: ");
-    bzero(word, 100);
+    bzero(word, 50);
     fflush(stdout);
 
-    read(0, word, 100);
+    read(0, word, 50);
 
     strtok(word, "\n"); // for enter
 }
@@ -44,10 +44,10 @@ void chooseWordBasedOnLetters(char* word, char* letters)
 {
     // input a word
     printf("Choose a word with the letters (%c%c): ", letters[0], letters[1]);
-    bzero(word, 100);
+    bzero(word, 50);
     fflush(stdout);
 
-    read(0, word, 100);
+    read(0, word, 50);
 
     strtok(word, "\n"); // for enter
 }
@@ -83,7 +83,7 @@ int main ()
 
     int OK = 0;
     int order_number;
-    char word[100];
+    char word[50];
     char letter;
     char letters[3];
 
@@ -103,7 +103,7 @@ int main ()
             // Playing first round
             printf("[1] Playing first round.\n");
 
-            bzero(word, 100);
+            bzero(word, 50);
 
             if(order_number == 0) // player needs to give a letter + word
             {
@@ -161,7 +161,7 @@ int main ()
 
             // read order number
             order_number = readNumber(sd);
-            bzero(word, 100);
+            bzero(word, 50);
 
             if(order_number == 0) // player needs to give a letter + word
             {

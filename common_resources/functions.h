@@ -62,7 +62,7 @@ void sendWord(char* word, int sd)
 {
     printf("[f] Sending the word %s to the socket %d\n", word, sd);
 
-    if (write(sd, word, 100) <= 0)
+    if (write(sd, word, 50) <= 0)
     {
         perror("[-] Error at write().\n");
     }
@@ -75,11 +75,11 @@ void readWord(char* word, int sd)
 {
     printf("[f] Reading word from socket %d\n", sd);
 
-    bzero(word, 100);
+    bzero(word, 50);
     fflush(stdout);
 
     // read the word
-    if (read(sd, word, 100) < 0)
+    if (read(sd, word, 50) < 0)
     {
         perror("[-] Error at read().\n");
     }
@@ -91,6 +91,7 @@ void getLastTwoLetters(char* word, char* letters)
 {
     printf("[f] Getting the last two letters..");
 
+    bzero(letters, 3);
     strcat(letters, &word[strlen(word) - 2]);
     strcat(letters, &word[strlen(word) - 1]); // get the last 2 letters of the last word
 
