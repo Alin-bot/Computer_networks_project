@@ -117,7 +117,7 @@ void playNormalRounds(int max_number_of_players, int players_list[max_number_of_
 }
 void sendNumberToAllPlayers(int max_number_of_players, int players_list[max_number_of_players], int number)
 {
-    printf("[+] Send OK = %d to clients..\n", number);
+    printf("[+] Sending OK = %d to clients..\n", number);
 
     for (int i = 0; i < max_number_of_players; ++i)
     {
@@ -190,6 +190,10 @@ int main()
 
     // reading max number of players
     int max_number_of_players = readMaxNumberOfClients("config_file.txt");
+
+    // opening the dictionary
+    FILE *fp;
+    fp = fopen("Dictionary.txt", "r"); // open file
 
     while(1)
     {
@@ -303,14 +307,13 @@ int main()
                     }
                 }
             }
-
             printf("[+]Game done.\n");
 
-            closePlayersList(max_number_of_players, players_list);
+            fclose(fp); // closing the dictionary
+            closePlayersList(max_number_of_players, players_list); // closing the remaining sd
 
             exit(0);
         }
-
         bzero(players_list, max_number_of_players);
     }
 }

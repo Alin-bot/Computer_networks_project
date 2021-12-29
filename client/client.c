@@ -23,7 +23,7 @@ void chooseLetter(char* letter)
 
     read(0, letter, 2);
 
-    strtok(letter, "\n");
+    strtok(letter, "\n"); // for enter
 }
 
 // read from player input a word
@@ -36,7 +36,7 @@ void chooseWord(char* word)
 
     read(0, word, 100);
 
-    strtok(word, "\n");
+    strtok(word, "\n"); // for enter
 }
 
 // read from player input a word with 
@@ -49,69 +49,7 @@ void chooseWordBasedOnLetters(char* word, char* letters)
 
     read(0, word, 100);
 
-    strtok(word, "\n");
-}
-
-int playFirstRound(int sd, char* word, int order_number)
-{
-    printf("[1] Playing first round.\n");
-
-	char letter;
-    bzero(word, 100);
-
-    if(order_number == 0) // player needs to give a letter + word
-	{	
-		// chose letter and send to server
-		chooseLetter(&letter);
-		printf("The letter you chose is: %c\n", letter);
-
-		sendLetter(&letter, sd);
-
-        // chose word and send to server
-		chooseWord(word);
-        printf("The word you chose is: %s\n", word);
-
-        sendWord(word, sd);
-	}
-	else // other players will wait
-	{
-		printf("A player is choosing a word, please wait %d more rounds..\n", order_number);
-
-	    // read letter
-		readLetter(&letter, sd);
-		printf("The player chose the letter: %c\n", letter);
-
-        // read word
-		readWord(word, sd);
-		printf("The player chose the word: %s\n", word);
-	}
-
-    return sd;
-}
-
-int playNormalRounds(int sd, char* word, char* letters, int order_number)
-{
-    printf("[2] Playing/Continue game after first round.\n");
-
-	order_number = readNumber(sd);
-    bzero(word, 100);
-
-    if(order_number == 0) // player needs to give a letter + word
-	{
-		// chose word and send to server
-		chooseWordBasedOnLetters(word, letters);
-		sendWord(word, sd);
-	}
-	else // other players will wait
-	{
-		printf("A player is choosing a word, please wait %d more rounds..\n", order_number);
-
-		// read word
-		readWord(word, sd);
-		printf("The player chose the word: %s\n", word);
-	}
-
-    return sd;
+    strtok(word, "\n"); // for enter
 }
 
 int main ()
@@ -146,11 +84,14 @@ int main ()
     int OK = 0;
     int order_number;
     char word[100];
+    char letter;
+    char letters[3];
 
-    while(1)
+    while(OK == 0)
 	{
 		while(OK == 0)
 		{
+            // read order number
             order_number = readNumber(sd);
 
             if(order_number == 999)
@@ -159,14 +100,40 @@ int main ()
                 return 0;
             }
 
-			sd = playFirstRound(sd, word, order_number);
+            // Playing first round
+            printf("[1] Playing first round.\n");
 
-            printf("THE WORD FIRST TIME: %s\n", word);
-			// if word was good
-            printf("We need to read the OK\n");
+            bzero(word, 100);
+
+            if(order_number == 0) // player needs to give a letter + word
+            {
+                // chose letter and send to server
+                chooseLetter(&letter);
+                printf("The letter you chose is: %c\n", letter);
+
+                sendLetter(&letter, sd);
+
+                // chose word and send to server
+                chooseWord(word);
+                printf("The word you chose is: %s\n", word);
+
+                sendWord(word, sd);
+            }
+            else // other players will wait
+            {
+                printf("A player is choosing a word, please wait %d more rounds..\n", order_number);
+
+                // read letter
+                readLetter(&letter, sd);
+                printf("The player chose the letter: %c\n", letter);
+
+                // read word
+                readWord(word, sd);
+                printf("The player chose the word: %s\n", word);
+            }
+
+            // if word was good / word was bad - based on the order number
             OK = readNumber(sd);
-            printf("We read the OK\n");
-
 			if(OK == 1)
 			{
 				printf("[+] The word was correct! The next player will continue..\n");
@@ -174,7 +141,7 @@ int main ()
 			else if(OK == 0 && order_number == 0)
 			{
 				printf("[-] You chose a wrong word, you will be disconnected!\n");
-				close(sd);
+				OK = 2;
 			}
 			else if(OK == 0)
 			{
@@ -184,21 +151,35 @@ int main ()
 
 		while(OK == 1)
 		{
-			char letters[3];
             bzero(letters, 3);
 
-            printf("THE WORD: %s\n", word);
-
+            // getting the last 2 letters of the word
             getLastTwoLetters(word, letters);
 
-            printf("THE WORD: %s THE LETTER: %c%c\n", word, letters[0], letters[1]);
-            sd = playNormalRounds(sd, word, letters, order_number);
+            // Playing next rounds after first round
+            printf("[2] Playing/Continue game after first round.\n");
 
-			// if word was good
-            printf("We need to read the OK\n");
+            // read order number
+            order_number = readNumber(sd);
+            bzero(word, 100);
+
+            if(order_number == 0) // player needs to give a letter + word
+            {
+                // chose word and send to server
+                chooseWordBasedOnLetters(word, letters);
+                sendWord(word, sd);
+            }
+            else // other players will wait
+            {
+                printf("A player is choosing a word, please wait %d more rounds..\n", order_number);
+
+                // read word
+                readWord(word, sd);
+                printf("The player chose the word: %s\n", word);
+            }
+
+			// if word was good / word was bad - based on the order number
             OK = readNumber(sd);
-            printf("We read the OK\n");
-
 			if(OK == 1)
 			{
 				printf("[+] The word was correct! The next player will continue..\n");
@@ -206,7 +187,7 @@ int main ()
 			else if(OK == 0 && order_number == 0)
 			{
 				printf("[-] You chose a wrong word, you will be disconnected!\n");
-				close(sd);
+                OK = 2;
 			}
 			else if(OK == 0)
 			{
@@ -214,4 +195,6 @@ int main ()
 			}
 		}
 	}
+    close(sd);
+    return 0;
 }
