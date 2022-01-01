@@ -54,13 +54,13 @@ void closePlayersList(int max_number_of_players, int list[max_number_of_players]
 }
 
 // function that see if word is in dictionary
-int wordIsGood(char* word, char* letter, FILE *fp)
+int wordIsGood(char* word, char* letter)
 {
     printf("[?] Checking if word is good.. with the word: %s, and letter/letters %s\n", word, letter);
 
-    char * line = NULL;
-    size_t len = 0;
-    ssize_t read;
+    // opening the dictionary
+    FILE *fp;
+    fp = fopen("Dictionary.txt", "r"); // open file
 
     // upper the letters in word
     char new_word[100];
@@ -73,57 +73,59 @@ int wordIsGood(char* word, char* letter, FILE *fp)
         strcat(new_word, &ch);
         i++;
     }
-    printf("New word in upper: %s\n", new_word);
+    new_word[strlen(new_word) - 1] = '\0';
 
     // upper the letters in letter
     char new_letters[3];
     bzero(new_letters, 3);
     i = 0;
 
-    while (letter[i]) {
-        ch = toupper(letter[i]);
-        strcat(new_letters, &ch);
-        printf("New word in upper: %s\n", new_word);
-        i++;
-    }
-    printf("New letters in upper: %s\n", new_letters);
+    ch = toupper(letter[0]);
+    strcat(new_letters, &ch);
+    ch = toupper(letter[1]);
+    strcat(new_letters, &ch);
+    new_letters[strlen(new_letters)] = '\0';
 
-    printf("these are the letters length....... %ld and the letters are: %s\n", strlen(new_letters), new_letters);
+    printf("New word in upper: -%s-\n", new_word);
+    printf("New letters in upper: -%s-\n", new_letters);
+
     // check if the word starts with letter/letters from letter variable
     ch = letter[1];
     if(ch == (1+'0'))
     {
         if(new_word[0] != new_letters[0])
         {
-            printf("[-] Word is wrong because doesn't mach input letter!\n");
+            printf("[-] Word is wrong because doesn't match input letter!\n");
+            fclose(fp); // closing the dictionary
             return 0;
         }
     }
     else
     {
-        if(mew_word[0] != new_letters[0] || new_word[1] != new_letters[1])
+        if(new_word[0] != new_letters[0] || new_word[1] != new_letters[1])
         {
             printf("[-] Word is wrong because letters doesn't match!\n");
+            fclose(fp); // closing the dictionary
             return 0;
         }
     }
 
-    return 1;
     // check in dictionary the word
     char buffer[100];
     bzero(buffer, 100);
-    while (fgets(buffer, 100, fp))
+    while (fgets(buffer, sizeof(buffer), fp))
     {
         // Remove trailing newline
-        buffer[strcspn(buffer, "\n")] = 0;
-        printf("WE COMPARE %s with %s\n", new_word, buffer);
-        if(!strcmp(new_word, buffer))
+        buffer[strlen(buffer) - 2] = '\0';
+        if(strcasecmp(word, buffer) == 0)
         {
             printf("[+] Word is good!\n");
+            fclose(fp); // closing the dictionary
             return 1;
         }
     }
 
+    fclose(fp); // closing the dictionary
     printf("[-] Word is wrong after checking in dictionary!\n");
     return 0;
 }
@@ -203,10 +205,6 @@ int main()
 
     // reading max number of players
     int max_number_of_players = readMaxNumberOfClients("config_file.txt");
-
-    // opening the dictionary
-    FILE *fp;
-    fp = fopen("Dictionary.txt", "r"); // open file
 
     while(1)
     {
@@ -288,7 +286,7 @@ int main()
                     strcat(ch, "1");
 
                     // if the word is good, announce players
-                    if(wordIsGood(word, ch, fp))
+                    if(wordIsGood(word, ch))
                     {
                         sendNumberToAllPlayers(max_number_of_players, players_list, 1);
 
@@ -337,7 +335,7 @@ int main()
                     }
 
                     // if the word is good, announce players
-                    if(wordIsGood(word, letter, fp))
+                    if(wordIsGood(word, letter))
                     {
                         sendNumberToAllPlayers(max_number_of_players, players_list, 1);
 
@@ -361,7 +359,6 @@ int main()
             }
             printf("[+]Game done.\n");
 
-            fclose(fp); // closing the dictionary
             closePlayersList(max_number_of_players, players_list); // closing the remaining sd
 
             exit(0);
