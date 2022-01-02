@@ -94,6 +94,8 @@ void getLastTwoLetters(char* word, char* letters)
     bzero(letters, 3);
     strcat(letters, &word[strlen(word) - 2]);
     strcat(letters, &word[strlen(word) - 1]); // get the last 2 letters of the last word
+    letters[strlen(letters)] = '\0';
+
 
     printf("the last letters are: %c%c\n", letters[0], letters[1]);
 }

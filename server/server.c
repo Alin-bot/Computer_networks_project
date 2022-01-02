@@ -62,38 +62,45 @@ int wordIsGood(char* word, char* letter)
     FILE *fp;
     fp = fopen("Dictionary.txt", "r"); // open file
 
-    // upper the letters in word
-    char new_word[100];
-    bzero(new_word, 100);
-    char ch;
-    int i = 0;
-
-    while (word[i]) {
-        ch = toupper(word[i]);
-        strcat(new_word, &ch);
-        i++;
-    }
-    new_word[strlen(new_word) - 1] = '\0';
-
-    // upper the letters in letter
-    char new_letters[3];
-    bzero(new_letters, 3);
-    i = 0;
-
-    ch = toupper(letter[0]);
-    strcat(new_letters, &ch);
-    ch = toupper(letter[1]);
-    strcat(new_letters, &ch);
-    new_letters[strlen(new_letters)] = '\0';
-
-    printf("New word in upper: -%s-\n", new_word);
-    printf("New letters in upper: -%s-\n", new_letters);
+//    // upper the letters in word
+//    char new_word[100];
+//    bzero(new_word, 100);
+//    char ch;
+//    int i = 0;
+//
+//    while (word[i]) {
+//        ch = toupper(word[i]);
+//        strcat(new_word, &ch);
+//        i++;
+//    }
+//    new_word[strlen(new_word) - 1] = '\0';
+//
+//    // upper the letters in letter
+//    char new_letters[3];
+//    bzero(new_letters, 3);
+//
+//    ch = toupper(letter[0]);
+//    strcat(new_letters, &ch);
+//    ch = toupper(letter[1]);
+//    strcat(new_letters, &ch);
+//    new_letters[strlen(new_letters)] = '\0';
+//
+//    printf("New word in upper: -%s-\n", new_word);
+//    printf("New letters in upper: -%s-\n", new_letters);
 
     // check if the word starts with letter/letters from letter variable
-    ch = letter[1];
-    if(ch == (1+'0'))
+    char first_word[3];
+    char first_letter[3];
+    bzero(first_word, 3);
+    bzero(first_letter, 3);
+    if(letter[1] == (1+'0'))
     {
-        if(new_word[0] != new_letters[0])
+        first_word[0] = word[0];
+        first_word[strlen(first_word)] = '\0';
+        first_letter[0] = letter[0];
+        first_letter[strlen(first_letter)] = '\0';
+        printf("word: -%s- letter: -%s-\n", first_word, first_letter);
+        if(strcasecmp(first_word, first_letter))
         {
             printf("[-] Word is wrong because doesn't match input letter!\n");
             fclose(fp); // closing the dictionary
@@ -102,7 +109,16 @@ int wordIsGood(char* word, char* letter)
     }
     else
     {
-        if(new_word[0] != new_letters[0] || new_word[1] != new_letters[1])
+        printf("real word: -%s- real letter: -%s-\n", word, letter);
+        printf("word: -%s- letter: -%s-\n", first_word, first_letter);
+        first_word[0] = word[0];
+        first_word[1] = word[1];
+        first_word[strlen(first_word)] = '\0';
+        first_letter[0] = letter[0];
+        first_letter[1] = letter[1];
+        first_letter[strlen(first_letter)] = '\0';
+        printf("word: -%s- letter: -%s-\n", first_word, first_letter);
+        if(strcasecmp(first_word, first_letter))
         {
             printf("[-] Word is wrong because letters doesn't match!\n");
             fclose(fp); // closing the dictionary
