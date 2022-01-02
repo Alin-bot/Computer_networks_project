@@ -62,32 +62,6 @@ int wordIsGood(char* word, char* letter)
     FILE *fp;
     fp = fopen("Dictionary.txt", "r"); // open file
 
-//    // upper the letters in word
-//    char new_word[100];
-//    bzero(new_word, 100);
-//    char ch;
-//    int i = 0;
-//
-//    while (word[i]) {
-//        ch = toupper(word[i]);
-//        strcat(new_word, &ch);
-//        i++;
-//    }
-//    new_word[strlen(new_word) - 1] = '\0';
-//
-//    // upper the letters in letter
-//    char new_letters[3];
-//    bzero(new_letters, 3);
-//
-//    ch = toupper(letter[0]);
-//    strcat(new_letters, &ch);
-//    ch = toupper(letter[1]);
-//    strcat(new_letters, &ch);
-//    new_letters[strlen(new_letters)] = '\0';
-//
-//    printf("New word in upper: -%s-\n", new_word);
-//    printf("New letters in upper: -%s-\n", new_letters);
-
     // check if the word starts with letter/letters from letter variable
     char first_word[3];
     char first_letter[3];
